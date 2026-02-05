@@ -1,0 +1,21 @@
+[sources.docker_logs]
+type = "docker_logs"
+
+[transforms.cleanup]
+type = "remap"
+inputs = ["docker_logs"]
+source = "del(.label)"
+
+[sinks.elasticsearch]
+type = "elasticsearch"
+inputs = ["cleanup"]
+endpoints = ["http://elasticsearch:9200"]
+mode = "bulk"
+
+[sinks.elasticsearch.bulk]
+index = "api-logs-%Y-%m-%d"
+
+[sinks.elasticsearch.auth]
+strategy = "basic"
+user = "admin"
+password = "${KIBANA_ADMIN_PASSWORD}"
